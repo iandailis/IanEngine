@@ -1,0 +1,82 @@
+cmake_minimum_required(VERSION 3.21)
+
+set(CMAKE_CXX_COMPILER "/MinGW/mingw64/bin/g++.exe")
+
+set (CMAKE_CXX_STANDARD 20)
+
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_VULKAN_STATIC ON CACHE BOOL "" FORCE)
+
+project(IanEngine VERSION 1.0.0)
+
+find_package(Vulkan REQUIRED)
+add_subdirectory(lib/glfw)
+add_subdirectory(lib/glm)
+add_subdirectory(lib/tinyobjloader)
+include_directories(lib/stb)
+
+add_library(IanEngine SHARED lib/IanEngine/EventHandler.cpp)
+
+target_link_libraries(IanEngine glfw glm tinyobjloader Vulkan::Vulkan)
+set_target_properties(IanEngine PROPERTIES PUBLIC_HEADER lib/IanEngine/IanEngine.h)	# SET THE PUBLIC HEADER
+
+# USEFUL SOURCE: https://www.f-ax.de/dev/2020/10/07/cmake-config-package.html
+
+include(GNUInstallDirs)	# ABSTRACTS VARIABLE NAMES
+
+target_include_directories(	# INCLUDE DIRECTORIES 
+	${PROJECT_NAME}	# DIFFERENT DIRECTORIES DEPENDING UPON BUILD OR INSTALL, not rly sure why tho
+		PUBLIC
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_INSTALL_INCLUDEDIR}>
+			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+install(	# MAKING AN EXPORT
+    TARGETS ${PROJECT_NAME} glm glfw tinyobjloader	# SETTING TARGET
+    EXPORT ${PROJECT_NAME}Targets	# EXPORTING TARGET
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}	# SETTING DESTINATIONS
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}	
+)
+install(FILES lib/IanEngine/Vertices.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})	# PRIVATE HEADERS NEEDED BY THE PUBLIC
+install(FILES lib/IanEngine/Include.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(DIRECTORY lib/glm/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})	# LIBRARY HEADERS NEEDED FOR PUBLIC HEADER
+install(DIRECTORY lib/stb/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})	# not great that I need to install the whole header library, but it's fine for now
+
+install(	# INSTALLING THE EXPORTED TARGET
+    EXPORT ${PROJECT_NAME}Targets 
+    FILE ${PROJECT_NAME}Targets.cmake	# THIS IS THE EXPORT FILE NAME, USED IN THE CONFIG.CMAKE FILE
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake	# SAME DESTINATION AS OTHER CMAKE FILES INSIDE SHARE
+    # NAMESPACE ${PROJECT_NAME}::	# SET NAMESPACE (OPTIONAL FOR THIS SMALL EXAMPLE)
+)
+
+# CONFIG.CMAKE
+include(CMakePackageConfigHelpers)	# CONFIG WRITER HELPER
+configure_package_config_file(		# MAKES A CONFIG FROM ${PROJECT_NAME}Config.cmake.in
+	in/${PROJECT_NAME}Config.cmake.in	# IN THIS CASE IT JUST INCLUDES THE EXPORTED TARGETS FILE
+	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake	# BUT THE INCLUDE GETS EXPANDED BY THIS SUBROUTINE
+	INSTALL_DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake	# SAME DESTINATION AS OTHER CMAKE FILES INSIDE SHARE
+)
+write_basic_package_version_file(	# CREATE PACKAGE VERSION FILE
+	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+	COMPATIBILITY SameMajorVersion	# idk what this is but its prolly right. sets some compatibility
+)
+install(	# INSTALL PACKAGE VERSION FILE
+	FILES	${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+			${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}/cmake	# SAME DESTINATION AS OTHER CMAKE FILES INSIDE SHARE
+)
+
+# PKGCONFIG (i have no idea what this does, hopefully it works if anyone needs it)
+configure_file(in/${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)	# configures mylib.pc.in file
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)	# then installs it
+
+
+add_custom_target(	# PRINT OUT THE PATH SO YOU CAN ADD IT YOURSELF TO USE THE LIBRARY
+	FinalMessage ALL
+	${CMAKE_COMMAND} -E echo "${CMAKE_INSTALL_FULL_BINDIR}"
+	COMMENT "ADD THIS TO YOUR PATH:"
+)

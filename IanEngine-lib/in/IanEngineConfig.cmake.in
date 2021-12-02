@@ -1,0 +1,6 @@
+@PACKAGE_INIT@
+
+find_package(Threads)
+find_package(Vulkan)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
