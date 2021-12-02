@@ -15,15 +15,15 @@ To run:
 
 Currently, this is what you can do:
 
-* W/S : Move camera in the Y axis
-* A/D : Move camera in the X axis
-* Q/E : Move camera in the Z axis
+* W/S : Move camera along the Y axis
+* A/D : Move camera along the X axis
+* Q/E : Move camera along the Z axis
 * Z/X/C : Rotate camera around the Z/X/Y axis
 * PG_DN/PG_UP : Zoom camera out/in
 * +/- : Select object to move
-* I/K J/L U/O : Moves selected object with same control mapping as for camera movemet
+* I/K J/L U/O : Moves selected object with same control mapping as for camera movement
 * F/G/H : Rotates selected object around its X/Y/Z axis. These axes are parallel to the coordinate axis. 
-* Space : snakey snake snake
+* Space (Hold) : snakey snake snake
 
 You can generate the following objects:
 * Right Triangle
