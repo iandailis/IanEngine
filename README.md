@@ -10,7 +10,7 @@ To run:
 1. Go to IanEngine-run
 2. Make a build directory, then go inside of it.
 3. Run "cmake .." then "make"
-4. Add the library location to PATH. The install location is printed right before all the files are installed, during step 3 of installation.]
+4. Add the library location to PATH. The install location is printed right before all the files are installed, during step 3 of installation.
 5. Run the program. 
 
 Currently, this is what you can do:
