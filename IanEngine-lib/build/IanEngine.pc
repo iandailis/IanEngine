@@ -1,0 +1,12 @@
+prefix=C:/Program Files (x86)/IanEngine
+exec_prefix=C:/Program Files (x86)/IanEngine
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: IanEngine
+Description: 
+Version: 1.0.0
+
+Requires:
+Libs: -L${libdir} -lIanEngine
+Cflags: -I${includedir}
