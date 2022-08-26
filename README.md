@@ -1,5 +1,5 @@
 # IanEngine
-3D engine running on Vulkan/GLFW and packaged/installed with CMake.
+3D graphics engine running on Vulkan/GLFW and packaged/installed with CMake.
 
 To install:
 1. Go to IanEngine-lib
